@@ -8,13 +8,17 @@ import {
 } from 'remix'
 import type {MetaFunction} from 'remix'
 import tailwind from './tailwind.css'
+import reset from './styles/reset.css'
 
 export const meta: MetaFunction = () => {
   return {title: 'New Remix App'}
 }
 
 export function links() {
-  return [{rel: 'stylesheet', href: tailwind}]
+  return [
+    {rel: 'stylesheet', href: tailwind},
+    {rel: 'stylesheet', href: reset},
+  ]
 }
 
 export default function App() {
@@ -27,7 +31,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <div id="root">
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         {process.env.NODE_ENV === 'development' && <LiveReload />}
