@@ -1,5 +1,5 @@
 import {useLoaderData, LoaderFunction} from 'remix'
-import {getPostData, Post} from '~/post'
+import {getPostData, Post} from '~/route-components/blog'
 
 export const loader: LoaderFunction = async ({params}) => {
   return await getPostData(params.slug!)
