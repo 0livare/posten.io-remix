@@ -1,17 +1,17 @@
 import {useLoaderData, LoaderFunction} from 'remix'
-import {getPostData, Post} from '~/route-components/blog'
+import {getPost, Post} from '~/route-components/blog'
 
 export const loader: LoaderFunction = async ({params}) => {
-  return await getPostData(params.slug!)
+  return await getPost(params.slug!)
 }
 
 export default function PostSlug() {
   const post: Post = useLoaderData()
   return (
-    <div>
-      <h1>{post.title}</h1>
-      <h2>{post.date}</h2>
-      <div>{post.body}</div>
+    <div className="prose lg:prose-xl mx-auto pb-8 pt-12">
+      <h1 className="mb-0">{post.title}</h1>
+      <p>{post.date}</p>
+      <div dangerouslySetInnerHTML={{__html: post.body}} />
     </div>
   )
 }

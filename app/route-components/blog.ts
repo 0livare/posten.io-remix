@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import parseFrontMatter from 'front-matter'
 import * as yup from 'yup'
 import {glob} from 'glob'
+import MarkdownIt from 'markdown-it'
 
 let postAttrSchema = yup.object().shape({
   title: yup.string().required(),
@@ -21,9 +22,33 @@ export type Post = {
   body: string
 }
 
-export async function getPostData(slug: string) {
+let md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  langPrefix: 'language-',
+  typographer: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return (
+          '<pre class="hljs"><code>' +
+          hljs.highlight(str, {language: lang, ignoreIllegals: true}).value +
+          '</code></pre>'
+        )
+      } catch (__) {}
+    }
+
+    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
+  },
+})
+
+export async function getPost(slug: string) {
   let allPostData = await getAllPostData()
-  return allPostData.find((datum) => datum.slug === slug)
+  let postData = allPostData.find((datum) => datum.slug === slug) ?? ({} as Post)
+  return {
+    ...postData,
+    body: md.render(postData.body),
+  }
 }
 
 export async function getAllPostData(): Promise<Post[]> {
@@ -36,7 +61,7 @@ export async function getAllPostData(): Promise<Post[]> {
       let file = await fs.readFile(filePath)
       let {attributes, body} = parseFrontMatter(file.toString())
       let attrs = await postAttrSchema.validate(attributes)
-      return {...attrs, date: attrs.date.toISOString(), body}
+      return {...attrs, date: formatDate(attrs.date), body}
     }),
   )
 }
@@ -51,4 +76,8 @@ function globPromise(path: string): Promise<string[]> {
       }
     })
   })
+}
+
+function formatDate(date: Date) {
+  return date.toISOString().split('T')[0]
 }

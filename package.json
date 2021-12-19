@@ -14,9 +14,12 @@
   "dependencies": {
     "@remix-run/react": "^1.1.1",
     "@remix-run/serve": "^1.1.1",
+    "@tailwindcss/typography": "^0.5.0",
+    "@types/markdown-it": "^12.2.3",
     "concurrently": "^6.5.0",
     "front-matter": "^4.0.2",
     "glob": "^7.2.0",
+    "markdown-it": "^12.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "remix": "^1.1.1",
