@@ -1,12 +1,13 @@
 import {useLoaderData, LoaderFunction, Link} from 'remix'
-import {getAllPostData, Post} from '~/route-components/blog'
+import {allPostData, Post} from '~/route-components'
 
 export const loader: LoaderFunction = async ({params}) => {
-  return await getAllPostData()
+  return await allPostData
 }
 
 export default function Code() {
   let posts = useLoaderData<Post[]>()
+  console.log(`posts`, posts)
   return (
     <>
       <h1>Code Posts</h1>

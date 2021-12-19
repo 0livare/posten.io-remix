@@ -7,6 +7,9 @@ import * as yup from 'yup'
 import {glob} from 'glob'
 import MarkdownIt from 'markdown-it'
 import {CodeBlock, dracula} from 'react-code-blocks'
+import {bundleMDX} from 'mdx-bundler'
+
+import {Post} from './types'
 
 let postAttrSchema = yup.object().shape({
   title: yup.string().required(),
@@ -15,15 +18,6 @@ let postAttrSchema = yup.object().shape({
   date: yup.date().required(),
   slug: yup.string().required(),
 })
-
-export type Post = {
-  title: string
-  description: string
-  imageFilename?: string
-  date: string
-  slug: string
-  body: string
-}
 
 let md = new MarkdownIt({
   html: true,
@@ -53,25 +47,29 @@ function highlightCode(sourceCode: string, language: string) {
 }
 
 export async function getPost(slug: string) {
-  let allPostData = await getAllPostData()
-  let postData = allPostData.find((datum) => datum.slug === slug) ?? ({} as Post)
-  return {
-    ...postData,
-    body: md.render(postData.body),
-  }
+  let data = await allPostData
+  return data.find((datum) => datum.slug === slug) ?? ({} as Post)
 }
 
-export async function getAllPostData(): Promise<Post[]> {
-  let postFilePaths = await globPromise(
-    path.join(__dirname, '..', 'content', 'posts', '**', '*.md'),
-  )
+export const allPostData = getAllPostData()
+async function getAllPostData(): Promise<Post[]> {
+  // When this runs, it's in /build
+  let globPath = path.resolve(__dirname, '..', 'app', 'posts', 'code', '*.mdx')
+
+  let postFilePaths = await globPromise(globPath)
 
   return await Promise.all(
     postFilePaths.map(async (filePath) => {
       let file = await fs.readFile(filePath)
-      let {attributes, body} = parseFrontMatter(file.toString())
-      let attrs = await postAttrSchema.validate(attributes)
-      return {...attrs, date: formatDate(attrs.date), body}
+
+      let result = await bundleMDX({
+        source: file.toString(),
+      })
+
+      let {code, frontmatter} = result
+      let attrs = await postAttrSchema.validate(frontmatter)
+
+      return {...attrs, date: formatDate(attrs.date), code}
     }),
   )
 }
