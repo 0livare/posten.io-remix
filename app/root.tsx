@@ -1,11 +1,4 @@
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from 'remix'
+import {Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration} from 'remix'
 import type {MetaFunction} from 'remix'
 import tailwind from './tailwind.css'
 import reset from './styles/reset.css'
@@ -30,7 +23,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="dark:bg-slate-800 dark:text-gray-100">
         <div id="root">
           <Outlet />
         </div>

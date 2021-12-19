@@ -1,9 +1,12 @@
+import ReactDOM from 'react-dom'
+import ReactDOMServer from 'react-dom/server'
 import path from 'path'
 import fs from 'fs/promises'
 import parseFrontMatter from 'front-matter'
 import * as yup from 'yup'
 import {glob} from 'glob'
 import MarkdownIt from 'markdown-it'
+import {CodeBlock, dracula} from 'react-code-blocks'
 
 let postAttrSchema = yup.object().shape({
   title: yup.string().required(),
@@ -27,20 +30,27 @@ let md = new MarkdownIt({
   linkify: true,
   langPrefix: 'language-',
   typographer: true,
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return (
-          '<pre class="hljs"><code>' +
-          hljs.highlight(str, {language: lang, ignoreIllegals: true}).value +
-          '</code></pre>'
-        )
-      } catch (__) {}
-    }
-
-    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
-  },
+  highlight: highlightCode,
 })
+
+function highlightCode(sourceCode: string, language: string) {
+  let r = ReactDOMServer.renderToString(
+    <CodeBlock
+      text={sourceCode}
+      language={language}
+      showLineNumbers
+      style={{background: 'red'}}
+      theme={dracula}
+    />,
+  )
+
+  console.log({
+    sourceCode,
+    language,
+    toReturn: r,
+  })
+  return r
+}
 
 export async function getPost(slug: string) {
   let allPostData = await getAllPostData()
