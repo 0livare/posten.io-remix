@@ -7,14 +7,14 @@ import {
   ScrollRestoration,
 } from 'remix'
 import type {MetaFunction} from 'remix'
-import styles from './tailwind.css'
+import tailwind from './tailwind.css'
 
 export const meta: MetaFunction = () => {
   return {title: 'New Remix App'}
 }
 
 export function links() {
-  return [{rel: 'stylesheet', href: styles}]
+  return [{rel: 'stylesheet', href: tailwind}]
 }
 
 export default function App() {
